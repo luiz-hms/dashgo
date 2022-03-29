@@ -16,7 +16,6 @@ import {
   Spinner,
   Link,
 } from "@chakra-ui/react";
-import { GetServerSideProps } from "next";
 import NextLink from "next/link";
 import { useState } from "react";
 import { RiAddLine, RiPencilLine } from "react-icons/ri";
@@ -26,13 +25,10 @@ import { SideBar } from "../../components/SideBar";
 import { api } from "../../services/api";
 import { useUsers } from "../../services/hooks/useUsers";
 import { queryClient } from "../../services/queryClient";
-import { getUsers } from "../../services/utils/getUsers";
 
-export default function UserList({ users }) {
+export default function UserList() {
   const [page, setPage] = useState(1);
-  const { data, isLoading, isFetching, error } = useUsers(page, {
-    initialData: users,
-  });
+  const { data, isLoading, isFetching, error } = useUsers(page);
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true,
@@ -99,7 +95,7 @@ export default function UserList({ users }) {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {users.map((user) => {
+                  {data.users.map((user) => {
                     return (
                       <>
                         <Tr key={user.id}>
@@ -142,7 +138,7 @@ export default function UserList({ users }) {
                 </Tbody>
               </Table>
               <Pagination
-                totalCountOfRegisters={users.totalCount}
+                totalCountOfRegisters={data.totalCount}
                 currentPage={page}
                 onPageChange={setPage}
               />
@@ -153,12 +149,3 @@ export default function UserList({ users }) {
     </Box>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  const { users, totalCount } = await getUsers(1);
-  return {
-    props: {
-      users,
-    },
-  };
-};
